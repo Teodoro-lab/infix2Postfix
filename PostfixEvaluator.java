@@ -3,7 +3,7 @@ import java.lang.Math;
 
 public class PostfixEvaluator {
     public float eval(String postfixExpression) {
-        //El código da por hecho que la expresión infija solo maneja dijitos [0-9]
+
         Stack<String> stack = new Stack<String>();
         float first, second, result = 0;
         Character character;
@@ -26,6 +26,8 @@ public class PostfixEvaluator {
                 } else 
                     stack.push(String.valueOf(character));
             } else {
+                if(stack.size() < 2)
+                    continue;
 
                 second = Float.valueOf(stack.pop());
                 first = Float.valueOf(stack.pop());

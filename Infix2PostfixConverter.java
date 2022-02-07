@@ -17,57 +17,64 @@ public class Infix2PostfixConverter {
         }
     }
 
-    public String convert(String infixExpression) {
-        String postfixExpression = "";
-        Stack<Character> stack = new Stack<Character>();
-        stack.push('#');
-
+    public String convert(String infixStr) {
+        Stack<Character> stk = new Stack<>();
+        String postfixStr = "";
         String longNumbers = " ";
-        char character;
-        for (int i = 0; i < infixExpression.length(); i++) {
-            character = infixExpression.charAt(i);
+
+        for (int i = 0; i < infixStr.length(); i++) {
+            char character = infixStr.charAt(i);
 
             if (Character.isLetterOrDigit(character)) {
                 longNumbers += character;
                 try {
-                    if (!Character.isLetterOrDigit(infixExpression.charAt(i + 1))) {
+                    if (!Character.isLetterOrDigit(infixStr.charAt(i + 1))) {
                         if (longNumbers.length() == 2)
-                            postfixExpression += longNumbers.strip();
+                            postfixStr += longNumbers.strip();
                         else
-                            postfixExpression += longNumbers + " ";
+                            postfixStr += longNumbers + " ";
                         longNumbers = " ";
                     }
 
                 } catch (IndexOutOfBoundsException e) {
                     if (longNumbers != " ") {
-                        postfixExpression += longNumbers;
+                        postfixStr += longNumbers;
                     }
                 }
-            } else if (character == '(')
-                stack.push('(');
-            else if (character == '^')
-                stack.push('^');
-            else if (character == ')') {
-                while (stack.peek() != '#' && stack.peek() != '(') {
-                    postfixExpression += stack.pop();
+            } else if (character == '(') {
+                stk.push('(');
+            } else if (character == ')') {
+
+                while (!stk.isEmpty() && stk.peek() != '(') {
+                    postfixStr += stk.pop();
                 }
-                stack.pop();
+                if (!stk.isEmpty()) {
+                    stk.pop();
+                }
+
             } else {
-                if (precedence(character) > precedence(stack.peek()))
-                    stack.push(character);
-                else {
-                    while (stack.peek() != '#' && precedence(character) <= precedence(stack.peek())) {
-                        postfixExpression += stack.pop();
+                if (!stk.isEmpty() && precedence(character) > precedence(stk.peek())) {
+                    stk.push(character);
+                } else {
+                    while (!stk.isEmpty() && precedence(stk.peek()) >= precedence(character)) { 
+                                                                                                
+                        Character pop = stk.pop();
+                        if (character != '(') {
+                            postfixStr += pop;
+                        } else {
+                            character = pop;
+                        }
                     }
-                    stack.push(character);
+                    stk.push(character);
                 }
 
             }
         }
-        while (stack.peek() != '#') {
-            postfixExpression += stack.pop(); // store and pop until stack is not empty.
+        while (!stk.isEmpty()) {
+            Character c = stk.pop();
+            if (c != ';')
+                postfixStr += stk.pop();
         }
-        return postfixExpression;
+        return postfixStr;
     }
-
 }
